@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
 import { Loading } from './LoadingComponent';
 import { baseUrl } from '../shared/baseUrl';
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
 const required = (val) => val && val.length;
 const maxLength = (len) => (val) => !(val) || (val.length <= len);
@@ -115,15 +116,15 @@ function RenderComments({comments, postComment, dishId}) {
         return (<div></div>);
     }
     const clist = comments.map((comment) => {
-        return (
-            <div>
-            <li key={comment.id} >
-                        {comment.comment}
-                        <br /><br />
-                        -- {comment.author}, {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(Date.parse(comment.date)))}
-                        <br /><br />
-            </li>
-            </div>
+        return (   
+            <div>      
+                <Fade in>
+                    <li key={comment.id}>
+                        <p>{comment.comment}</p>
+                        <p>-- {comment.author} , {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.date)))}</p>
+                    </li>
+                </Fade>
+            </div>  
         );
     });
     
@@ -132,9 +133,11 @@ function RenderComments({comments, postComment, dishId}) {
         <div className="ml-3">
             <h4>Comments</h4>
             <ul className="list-unstyled">
-                {clist}
+                <Stagger in>
+                    {clist}
+                </Stagger>
             </ul>
-            <CommentForm dishId={dishId} postComment={postComment} />
+             <CommentForm dishId={dishId} postComment={postComment} />
             <br />
             <hr />
         </div>
@@ -145,14 +148,16 @@ function RenderComments({comments, postComment, dishId}) {
 function RenderDish(props) {
     if (props.dish != null) {
         return (
-            <div className='col-12 col-md-5 m-1'>
-                <Card>
-                    <CardImg top src={baseUrl + props.dish.image} alt={props.dish.name} />
-                    <CardBody>
-                        <CardTitle>{props.dish.name}</CardTitle>
-                        <CardText>{props.dish.description}</CardText>
-                    </CardBody>
-                </Card>
+            <div>
+                <FadeTransform in transformProps={{exitTransform: 'scale(0.5) translateY(-50%)'}}>
+                    <Card>
+                        <CardImg top src={baseUrl + props.dish.image} alt={props.dish.name} />
+                        <CardBody>
+                            <CardTitle>{props.dish.name}</CardTitle>
+                            <CardText>{props.dish.description}</CardText>
+                        </CardBody>
+                    </Card>
+                </FadeTransform>
             </div>
         )
     }
@@ -195,13 +200,14 @@ const Dishdetail = (props) => {
                         </div>
                 </div>
                 <div className='row'>
-                    <br/> <br/> <br/>
-                    <hr />
-                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-                    <RenderDish dish={props.dish} />
-                    &nbsp; 
-                    <RenderComments comments={props.comments} postComment={props.postComment} dishId={props.dish.id} />
+                    <Col sm={6}>
+                        <RenderDish dish={props.dish} />
+                    </Col>
+                    <Col sm={6}>
+                        <RenderComments comments={props.comments} postComment={props.postComment} dishId={props.dish.id} />
+                    </Col>
                 </div>
+                <br/><hr/>
             </div>
         )
     }
